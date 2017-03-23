@@ -14,7 +14,8 @@ module.exports = function (config) {
     'plugins' : [
         'karma-mocha',
         'karma-mocha-reporter',
-        'karma-sourcemap-loader'
+        'karma-sourcemap-loader',
+        'karma-phantomjs-launcher'
     ],
     // list of files / patterns to load in the browser
     files: [
