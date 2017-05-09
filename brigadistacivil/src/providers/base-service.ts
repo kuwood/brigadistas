@@ -12,6 +12,7 @@ import Environment from '../environment';
 @Injectable()
 export class BaseService {
   public static apiUrl: string;
+  public static baseUrl: string;
   public static env: string = "production"; //production or development or test
   public static device: string; //mobile or web
   profile: any;
@@ -33,6 +34,7 @@ export class BaseService {
     else{
       BaseService.apiUrl = Environment.apiBase;
     }
+    BaseService.baseUrl = Environment.baseUrl;
 
     if(window.location.pathname.includes("asset")) BaseService.device="mobile";
     else BaseService.device="web";
@@ -78,13 +80,29 @@ export class BaseService {
     });
   }
 
-  doPost(url: string,data: any){
+  doPost(url: string,data: any,files: any=null){
     return new Promise( (resolve,reject) => {
       let headers=this.doHeaders(data);  //let headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded' });
+      if(files) headers._headers.delete("content-type");
       let options = new RequestOptions({ headers: headers, method:  'post' });
       if(!data) data={};
 
-      return this.http.post(BaseService.apiUrl+url,  JSON.stringify(data), options  )
+      let formData;
+
+      if(files){
+        formData = new FormData()
+        if(files.length==1){
+          formData.append("uploads", files[0], files[0].name);
+        }else{
+          for (let i = 0; i < files.length; i++) {
+              formData.append("uploads[]", files[i], files[i].name);
+          }
+        }
+      }else{
+        formData=JSON.stringify(data);
+      }
+
+      return this.http.post(BaseService.apiUrl+url, formData, options  )
         .map(res => res.json())
         .subscribe(data => {
           resolve(data);

@@ -2,11 +2,10 @@
   "app": {
     "name": "Brigadista Civil"
   },
-  "chat": {
-    "title": "Conversa",
-    "notfound": "Conversa não encontrada para este fogo"
-  },
   "brigade": {
+    "approve":"Aprovar",
+    "promote": "Promover",
+    "requested": "Entrar Brigada",
     "title": "Brigada",
     "promoteBrigade": {
       "action": "Promover a Líder",
@@ -42,19 +41,40 @@
     "title": "Brigadas",
     "see": "Ver brigada"
   },
+  "chat": {
+    "deleted": "Conversa removida com sucesso",
+    "title": "Conversa",
+    "notfound": "Conversa não encontrada para este fogo",
+    "select": "Selecione um usuário",
+    "new": {
+      "error": "Não foi possível abrir um chat, se persistir entre em contato conosco"
+    }
+  },
+  "error": {
+    "gps": "Error ao conectar com seu GPS",
+    "notavailableweb": "Esta funcionalidade não está disponível para versão web ou desktop, apenas em dispositivo móvel"
+  },
   "fire": {
     "title": "Ver Incêndio",
     "chooseLocation": "Clique no mapa e informe o local do incêndio",
-    "startCombat": "Combater Incêndio",
+    "startCombat": "Iniciar Combate",
+    "enterCombat": "Entrar no Combate",
     "stopCombat": "Sair do Combate",
     "checking": "Verificar Incêndio",
     "confirmed": "Confirmar Incêndio",
     "not_confirmed": "Não confirmar",
     "initCombat": "Iniciar Combate",
-    "endCombat": "Sair do Combate",
+    "endCombat": "Finalizar Combate",
     "aftermath": "Iniciar Rescaldo",
     "closeCombat": "Encerrar Combate",
     "finished": "Incêndio Combatido",
+    "intensity": {
+      "verystrong": "Muito Forte",
+      "strong": "Forte",
+      "medium": "Médio",
+      "weak": "Fraco",
+      "veryweak": "Muito Fraco"
+    },
     "new": {
       "title": "Reporta Incêndio",
       "fieldTitle": "Nome (ex. Fogo no Alto da Serra)",
@@ -67,6 +87,34 @@
   "fires": {
     "title": "Incêndios",
     "see": "Ver Incêndio"
+  },
+  "item": {
+    "status": {
+      "new": "Ítem críado com sucesso",
+      "updated": "Ítem atualizado com sucesso"
+    },
+    "types": {
+      "plant": "Planta",
+      "rock":  "Pedra",
+      "water": "Água",
+      "hole": "Buraco",
+      "danger": "Perigo",
+      "trail": "Trilha",
+      "conservation": "Área de Conservação",
+      "city": "Cidade"
+    },
+    "category": "Categoria do ítem",
+    "chooseLocation": "Clique no mapa e informe o local do item que deseja adicionar no mapa",
+    "description": "Descrição sobre o item, ex: qual o tipo de planta, ou o sobre o perigo encontrado"
+  },
+  "map": {
+    "title": "Mapa",
+    "additem": "Adicionar Local",
+    "addarea": "Adicionar Área"
+  },
+  "picture": {
+    "take": "Tirar foto",
+    "get": "Imagem da Galeria"
   },
   "require": {
     "minString": "é obrigatório (mínimo de 5 caracteres)."
@@ -101,13 +149,16 @@
     },
     "update": {
       "title": "Perfil",
-      "error": "Não foi possível alterar seu perfil pois seu email já existe na nossa base ou houve um erro, entre em contato conosco."
+      "error": "Não foi possível alterar seu perfil pois seu email já existe na nossa base ou houve um erro, entre em contato conosco.",
+      "ok": "Seu perfil foi atualizado com sucesso"
     },
     "profile": {
-      "title": "Perfil do Usuário"
+      "title": "Perfil do Usuário",
+      "my": "Meu Perfil"
     }
   },
   "bio": "Como pode ajudar",
+  "blog": "Blog",
   "cancel": "Cancelar",
   "chooseOption": "Escolha uma opção",
   "chooseOptionFail": "Por favor, selecione uma opção para continuar.",
@@ -118,12 +169,17 @@
   "description": "Descrição",
   "done": "OK",
   "email": "Email",
+  "enter": "Entrar",
   "generalError": "Tivemos um erro durante a sua solicitação",
   "intensity": "Intensidade",
   "name": "Nome",
   "notfounditems": "Não foram encontrados informações.",
+  "options": "Opções",
+  "leaders": "Leaders",
   "location": "Localização",
   "password": "Senha",
+  "remove": "Remover",
   "title": "Título",
+  "save": "Salvar",
   "yesContinue": "Sim, desejo continuar"
 }

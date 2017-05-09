@@ -5,13 +5,15 @@ const { Brigade } = require('./models');
 const passport = require('passport');
 const { sendEmailAdmins,sendEmail } = require('../config/emailer');
 const { ensureAdmin } = require('../config/passport');
+const { storageAdd } = require('../config/storage');
 const {URL} = require('../config/config');
+const defaultArea={ type: 'Point', coordinates: [-122.424088, 37.529876] };
 
 router.get('/', function (req, res, next) {
-  Brigade.find({status: "active"},'name city desc createdAt').then(d => { res.json(d);});
+  Brigade.find({status: "active"},'name city desc createdAt image').then(d => { res.json(d);});
 });
 router.get('/:id', function (req, res, next) {
-  Brigade.findOne({_id: req.params.id}).populate("leaders").populate("requested").populate("brigades").then(d => { res.json(d);});
+  Brigade.findOne({_id: req.params.id}).populate("leaders","_id name image").populate("requested","_id name image").populate("brigades","_id name image").then(d => { res.json(d);});
 });
 
 router.put('/:id', passport.authenticate('basic', { session: false }),
@@ -23,14 +25,24 @@ router.put('/:id', passport.authenticate('basic', { session: false }),
   .catch(e=> {res.json(e);});
 });
 
+router.delete('/area/:id', passport.authenticate('basic', { session: false }),
+ function (req, res, next) {
+  var query={_id: req.params.id, leaders: { $in: [req.user._id] }};
+  Brigade.findOneAndUpdate(query,{area: defaultArea})
+  .then(d => { res.json(d);})
+  .catch(e=> {res.json(e);});
+});
+
 
 router.post('/', passport.authenticate('basic', { session: false }),
  function (req, res, next) {
-  let data=Object.assign(req.body, { leaders: [req.user._id], status: "waiting", createdAt: new Date(), updatedAt: new Date()} );
-  Brigade.create(req.body).then(d => {
+  let data=Object.assign(req.body, { leaders: [req.user._id], brigades: [req.user._id], status: "waiting", createdAt: new Date(), updatedAt: new Date(), area: defaultArea} );
+  Brigade.create(data).then(d => {
     res.json(d);
     let email= `Activate this brigade by accessing ${URL}/brigade/activate/${d._id}. Full details ${JSON.stringify(d)}`;
     sendEmailAdmins("New Brigade created",email);
+  }).catch(e=>{
+    res.json(e);
   });
 });
 
@@ -38,6 +50,15 @@ router.delete('/:id', passport.authenticate('basic', { session: false }),
  function (req, res, next) {
   var query={_id: req.params.id, leaders: { $in: [req.user._id] }};
   Brigade.findOneAndDelete(query,{},{}).then(d => { res.json(d);});
+});
+
+router.post('/image/:id', passport.authenticate('basic', { session: false }),function (req, res, next) {
+  var query={_id: req.params.id, leaders: { $in: [req.user._id] }};
+  Brigade.findOne(query).then(r=>{
+    req.params.datafolder="brigade";
+    req.params.datafield="image";
+    storageAdd(req,res,r,Brigade);
+  });
 });
 
 router.get('/activate/:id', passport.authenticate('basic', { session: false }), ensureAdmin,

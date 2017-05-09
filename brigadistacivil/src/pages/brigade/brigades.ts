@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 import {BrigadePage} from './brigade';
-import { BrigadeService} from '../../providers/brigade-service';
+import { BrigadeService} from '../../providers';
 import BasePage from '../basepage';
 
 
@@ -20,6 +20,7 @@ export class BrigadesPage extends BasePage {
   ionViewDidLoad() {
     this.brigadeService.getBrigades().then(d => {
       this.brigades = <Array<any>>d;
+      this.generalService.fileUrl(this.brigades);
     });
   }
 

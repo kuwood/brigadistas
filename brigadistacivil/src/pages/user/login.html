@@ -1,6 +1,9 @@
 <ion-header>
   <ion-navbar color="primary">
     <ion-title>{{ "app.name" | translate }}</ion-title>
+    <button ion-button menuToggle icon-only>
+     <ion-icon name="menu"></ion-icon>
+   </button>
   </ion-navbar>
 </ion-header>
 
@@ -23,6 +26,6 @@
 
   <button ion-button block (click)="register()">{{ "user.signin" | translate }}</button>
   <br/>
-  <a href="#" (click)="recover(loginForm.value)">Esqueceu a sua senha?</a>
+  <a href="#" (click)="recover(loginForm.value)">{{ "user.recover.title" | translate }}</a>
 
 </ion-content>

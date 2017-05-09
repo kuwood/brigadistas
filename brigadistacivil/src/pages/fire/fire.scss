@@ -1,6 +1,15 @@
 page-fire {
-  #map{
-    height: 200px;
-  width: 100%;
+  #map {
+    min-height: 200px;
+    height: 100%;
+    width: 100%;
+  }
+
+  .intensity {
+    text-align: center;
+  }
+
+  .tabbar{
+    bottom: 0px;
   }
 }

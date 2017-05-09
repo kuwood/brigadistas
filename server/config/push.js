@@ -1,24 +1,35 @@
 'use strict';
 var gcm = require('node-gcm');
 var apn = require('apn');
-const {APN_KEYID, APN_TEAMID,ANDROID_GCMKEY} = require('./config');
-var options,sender,apnProvider;
+const {APN_KEYID, APN_TEAMID,ANDROID_GCMKEY,APN_PATHKEY} = require('./config');
+var sender,apnProvider;
 const {logger} = require('../config/logger');
-
-function initPush(){
-  options = {
+const options = {
     token: {
-      key: "path/to/key.p8",
+      key: APN_PATHKEY,
       keyId: APN_KEYID,
       teamId: APN_TEAMID
     },
-    production: false
+   /* cert: APN_PATHCERT,
+    key: APN_PATHKEY,
+    passphrase: APN_PASSPHRASE,*/
+    production: true
   };
-  //TODO: create app on itunes
-  //apnProvider = new apn.Provider(options);
+  
+function initPush(){
+  try{
+    apnProvider = new apn.Provider(options);
+  }catch(e){
+    logger.error(`Error when starting ios push  ${e}`);
+  }
 
-  // Set up the sender with your GCM/FCM API key (declare this once for multiple messages)
-  sender = new gcm.Sender(ANDROID_GCMKEY);
+  try{
+    // Set up the sender with your GCM/FCM API key (declare this once for multiple messages)
+    sender = new gcm.Sender(ANDROID_GCMKEY);
+  }catch(e){
+    logger.error(`Error when starting android push ${e}`);
+  }
+  
 }
 
 
@@ -30,14 +41,14 @@ function initPush(){
  * @return {[type]}           [description]
  */
 function sendAndroid(message,regTokens){
-  var messageObject = new gcm.Message({message});
+  var messageObject = new gcm.Message({data: message});
   // Actually send the message
   logger.info(`SendAndroid   ${regTokens.join(" , ")} and ${message}`);
   sender.send(messageObject, { registrationTokens: regTokens }, function (err, response) {
       if (err) logger.error(`Error sending android token ${err}`);
       else if(response.failure>0){
         response.results.forEach(c=>{
-          logger.error(`Error when sengin android ${c.error}`);
+          logger.error(`Error when sending android ${c.error}`);
         });
       }
       else logger.info(`Response sending android token ${JSON.stringify(response)}`);
@@ -50,15 +61,21 @@ function sendAndroid(message,regTokens){
  * @param  {[type]} payload ex.: 'John Appleseed'
  * @return {[type]}         [description]
  */
-function sendiOS(alert,payload){
+function sendiOS(alert,regTokens){
   var note = new apn.Notification();
 
   note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
   note.badge = 3;
-  note.sound = "ping.aiff";
+  note.sound = "assets/mp3/atraso.mp3";
   note.alert = alert;
-  note.payload = {'messageFrom': payload};
-  note.topic = "br.com.brigadistacivil";
+  note.payload = {'messageFrom': 'BrigadistaCivil'};
+  note.topic = "br.com.brigadistacivil.ios";
+  logger.info(`Trying send iOS msg ${JSON.stringify(note)} to ${regTokens}`); //let deviceToken = Buffer.from(regTokens[0], 'base64').toString('hex');
+  
+  apnProvider.send(note, regTokens).then( (result) => {
+    if(result) logger.info(`Response sending iOS token ${JSON.stringify(result)}`);
+    else logger.error(`Error when sending iOS ${result}`);
+  });
 }
 
 module.exports = { initPush, sendAndroid, sendiOS};

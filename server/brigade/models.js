@@ -11,6 +11,8 @@ const BrigadeSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
+  logo: { type: String },
+  image: { type: String },
   description: { type: String },
   status: {type: String},
   ownership: { type: String },
@@ -23,15 +25,19 @@ const BrigadeSchema = new mongoose.Schema({
   createdAt: { type: Date },
   deletedAt: { type: Date },
   area: {
-    type : { type : String, default : 'Polygon' },
-    coordinates: []
+    type : { type : String, "enum": [
+            "Point",
+            "Polygon"
+        ] },
+    coordinates: {type: Array}
   }
 });
 BrigadeSchema.plugin(deepPopulate);
-BrigadeSchema.index({coordinates: '2dsphere'});
+BrigadeSchema.index({area: '2dsphere'});
+//db.brigade.ensureIndex({area:"2dsphere"});
 
 const Brigade = mongoose.model('Brigade', BrigadeSchema);
-
+Brigade.ensureIndexes();
 /**
  * Send alert of fire to all Brigades in the fire
  * @param  {[type]} brigades [description]
@@ -44,7 +50,7 @@ Brigade.pushToBrigades = function(brigades,message){
   brigades.forEach(bItem=>{
     bItem.brigades.forEach(userItem=>{
       if(userItem.androidkey) android.push(userItem.androidkey);
-      if(userItem.ioskey) ios.push(userItem.androidkey);
+      if(userItem.ioskey) ios.push(userItem.ioskey);
     });
   });
   let returnInfo={};

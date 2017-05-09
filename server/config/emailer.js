@@ -49,7 +49,7 @@ const sendEmailAdmins = (subject,text,html="") => {
 };
 
 const doErrorEmailAlerts = (err, req, res, next) => {
-  if (err) {
+  if (err && err.name!=="AuthenticationError") {
     logger.info(`Sending error alert email to ${ADMIN_EMAIL}`);
 
     const emailData = {
@@ -84,6 +84,8 @@ const makeTemplate = (template,data,cb)=>{
 
 /**
  * [sendEmailTemplate description]
+ *
+ * Ex:   sendEmailTemplate(result.username, "user/templates/welcome-email",{user: result});
  * @param  {[type]} emailto   [description]
  * @param  {[type]} template  [description]
  * @param  {[type]} data      [description]

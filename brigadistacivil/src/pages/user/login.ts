@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
 import {FormGroup, FormBuilder, Validators} from '@angular/forms';
 import { NavController, NavParams, AlertController, App, MenuController,
-          ToastController,LoadingController } from 'ionic-angular';
-import { UserService } from '../../providers/user-service';
+  ToastController, LoadingController, Platform
+} from 'ionic-angular';
+import { UserService } from '../../providers';
 import {TranslateService} from 'ng2-translate';
 import { UserPage } from './user';
 import { FiresPage } from '../fire/fires';
@@ -15,7 +16,7 @@ import BasePage from '../basepage';
 export class LoginPage extends BasePage {
   loginForm: FormGroup;
 
-  constructor(public app: App, public navCtrl: NavController, public navParams: NavParams, public userService: UserService,
+  constructor(public platform: Platform,public app: App, public navCtrl: NavController, public navParams: NavParams, public userService: UserService,
     public translateService: TranslateService, public alertCtrl: AlertController, public menuCtrl: MenuController,
     public fb: FormBuilder, public toastCtrl: ToastController, public loadingCtrl: LoadingController) {
     super();
@@ -38,8 +39,10 @@ export class LoginPage extends BasePage {
   }
 
   afterLogin() {
-    if ('deviceToken' in localStorage)
-      this.userService.storeDeviceToken('android', localStorage['deviceToken']);
+    if ('deviceToken' in localStorage){
+      if (this.platform && this.platform.is('ios')) this.userService.storeDeviceToken('ios',localStorage['deviceToken']);
+          else this.userService.storeDeviceToken('android',localStorage['deviceToken']);
+    }
     this.openPage(FiresPage);
     this.setMenu();
   }
@@ -53,7 +56,7 @@ export class LoginPage extends BasePage {
   }
 
   recover(form) {
-    this.showConfirm(this.translate("user.recover.confirm") + form.username,
+    this.showConfirm(this.translate("user.recover.confirm", {email: form.username}),
       this.translate("user.recover.title"), () => {
         this.userService.recover(form.username).then(r => {
           this.showToast(this.translate("user.recover.response"));

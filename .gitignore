@@ -23,19 +23,35 @@ www/build/
 $RECYCLE.BIN/
 typings/globals/
 typings/modules/
-platforms/
-
-.DS_Store
-Thumbs.db
-UserInterfaceState.xcuserstate
+!brigadistacivil/platforms/android/project.properties
+upload/
 
 #cordova
 plugins/
 plugins2/
 bower_components/
+brigadistacivil/*.cer
+brigadistacivil/*.pem
+brigadistacivil/*.p12
+brigadistacivil/node_modules/
+brigadistacivil/resources/*
+brigadistacivil/resources/android/**/*
+brigadistacivil/resources/ios/**/*
 
+server/config/*.p8
+
+# general
 .vscode
+.DS_Store
+Thumbs.db
+UserInterfaceState.xcuserstate
 
+# Tests
 test/.build/
 test/.bundles/
 .awcache/
+
+# Desktop electron
+brigadistacivil/BrigadistasLinux*
+brigadistacivil/BrigadistasOSX-*
+brigadistacivil/BrigadistasWin*

@@ -17,13 +17,65 @@
 //
 .readonlyInput {
 
-  ,.item-inner{
+  .item-inner{
     border-bottom-color: transparent !important;
      box-shadow: inset 0 -1px 0 0 transparent !important;
   }
 }
 
-#map {
+#map, .tabcontent {
   width: 100%;
-  height: 100%;
+  height: 90%;
+}
+
+.tabcontent {
+  overflow: scroll;
+}
+
+
+
+.card-background-page {
+
+  ion-card {
+    position: relative;
+    text-align: center;
+  }
+
+  .card-title {
+    position: absolute;
+    top: 36%;
+    font-size: 2.0em;
+    width: 100%;
+    font-weight: bold;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: rgba(255,255,255,.6);
+  }
+
+  .card-subtitle {
+    font-size: 1.0em;
+    position: absolute;
+    top: 52%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: rgba(255,255,255,.6);
+  }
+
+}
+
+ion-card img{
+  max-height: 100px;
+}
+
+.tabbar{
+  opacity: 1;
+  bottom: 55px;
+  position: fixed;
+}
+
+ion-tab ng-component {
+    min-height: 90% !important;
+}
+.show-tab ng-component {
+  overflow: scroll;
+    height: 90%;
 }

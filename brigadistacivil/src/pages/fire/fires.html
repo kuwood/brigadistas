@@ -12,41 +12,65 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content >
+<ion-content>
   <div *ngIf="fires">
 
-    <ion-card *ngFor="let fire of fires; let i = index;">
+    <ion-grid fixed>
+      <ion-row>
+        <ion-col *ngFor="let fire of fires; let i = index;" col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4>
 
-      <ion-list>
-        <ion-item text-wrap >
-          <h2>{{fire.title}}</h2>
-          <p>{{fire.description}}</p>
-        </ion-item>
-        <ion-item text-wrap *ngIf="fire.createdAt">
-          <ion-icon name="md-calendar" item-left large></ion-icon>
-          <h2>{{fire.createdAt |  date: 'dd/MM/yyyy H:mm' }}</h2>
-        </ion-item>
+          <ion-card>
 
-        <ion-item text-wrap>
-          <ion-icon name="md-thermometer" item-left large></ion-icon>
-          <h2>{{fire.intensity}}</h2>
-        </ion-item>
+            <ion-list>
 
-        <ion-item text-wrap>
-          <ion-icon name="md-person" item-left large></ion-icon>
-          <h2>{{fire.users[0].name}}</h2>
-        </ion-item>
+              <img [src]="fire.image" *ngIf="fire.image">
+              <img src="/assets/img/bg.jpg" *ngIf="!fire.image">
 
-        <ion-item actions>
-          <button (click)="showFire(fire)" ion-button color="secondary" clear item-right icon-left>
-            <ion-icon name='md-checkmark'></ion-icon>
-            {{ "fires.see" | translate }}
-          </button>
-        </ion-item>
 
-      </ion-list>
+              <ion-item text-wrap>
+                <h2>{{fire.title}}</h2>
+                <p>{{fire.description}}</p>
+              </ion-item>
 
-    </ion-card>
+              <ion-item  *ngIf="fire.users && fire.users.length>0">
+                <ion-avatar item-left>
+                  <img [src]="fire.users[0].image" *ngIf="fire.users[0].image" item-left large>
+                  <ion-icon name="md-person" *ngIf="!fire.users[0].image" item-left large></ion-icon>
+                </ion-avatar>
+                <h2>{{fire.users[0].name}}</h2>
+                <p *ngIf="fire.createdAt"> às {{fire.createdAt | date: 'dd/MM/yyyy H:mm' }}</p>
+              </ion-item>
+
+              <ion-item text-wrap *ngIf="!fire.users">
+                <ion-icon name="md-calendar" item-left large></ion-icon>
+                <h2>{{fire.createdAt | date: 'dd/MM/yyyy H:mm' }}</h2>
+              </ion-item>
+
+
+              <ion-item text-wrap>
+                <ion-icon name="md-thermometer" item-left large></ion-icon>
+                <h2 *ngIf="fire.intensity==100">{{ "fire.intensity.verystrong" | translate }}</h2>
+                <h2 *ngIf="fire.intensity==80">{{ "fire.intensity.strong" | translate }}</h2>
+                <h2 *ngIf="fire.intensity==60">{{ "fire.intensity.medium" | translate }}</h2>
+                <h2 *ngIf="fire.intensity==40">{{ "fire.intensity.weak" | translate }}</h2>
+                <h2 *ngIf="fire.intensity==20">{{ "fire.intensity.veryweak" | translate }}</h2>
+              </ion-item>
+
+
+              <ion-item actions>
+                <button (click)="showFire(fire)" ion-button color="secondary" clear item-right icon-left>
+                  <ion-icon name='md-checkmark'></ion-icon>
+                  {{ "fires.see" | translate }}
+                </button>
+              </ion-item>
+
+            </ion-list>
+
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
     <div id="map_canvas"></div>
   </div>
   <div *ngIf="!fires" padding>

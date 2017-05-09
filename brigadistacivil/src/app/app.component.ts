@@ -7,10 +7,10 @@ import { UserPage } from '../pages/user/user';
 import { LoginPage } from '../pages/user/login';
 import { ChatsPage } from '../pages/chat/chats';
 import { FiresPage } from '../pages/fire/fires';
+import { MapPage } from '../pages/geo/map';
 import { BrigadesPage } from '../pages/brigade/brigades';
 import { TranslateService } from 'ng2-translate';
-import { UserService } from '../providers/user-service';
-import { BaseService } from '../providers/base-service';
+import { UserService, BaseService } from '../providers';
 
 @Component({
   templateUrl: 'app.html'
@@ -52,9 +52,12 @@ export class MyApp {
         { title: 'BrigadesPage', component: BrigadesPage },
         { title: 'FiresPage', component: FiresPage },
         { title: 'ProfilePage', component: UserPage },
-        { title: 'ChatsPage', component: ChatsPage }
+        { title: 'ChatsPage', component: ChatsPage },
+        { title: 'LoginPage', component: LoginPage },
+        { title: 'MapPage', component: MapPage },
       ];
       if(this.platform.is('cordova')) {
+        BaseService.device="mobile";
         this.startPush();
         StatusBar.styleDefault();
         Splashscreen.hide();
@@ -77,7 +80,7 @@ export class MyApp {
       ios: {
         alert: 'true',
         badge: true,
-        sound: 'false'
+        sound: 'true'
       },
       windows: {}
     });
@@ -87,9 +90,10 @@ export class MyApp {
       this.push.on('registration', (data) => {
         localStorage['deviceToken']=data.registrationId;
 
-        if(UserService.loginData)
-          this.userService.storeDeviceToken('android',localStorage['deviceToken']);
-
+        if(UserService.loginData){
+          if (this.platform && this.platform.is('ios')) this.userService.storeDeviceToken('ios',localStorage['deviceToken']);
+          else this.userService.storeDeviceToken('android',localStorage['deviceToken']);
+        }
       });
 
       this.push.on('notification', (data) => {
@@ -121,6 +125,10 @@ export class MyApp {
   logout(){
     this.userService.logout();
     this.openPage(LoginPage);
+  }
+
+  isLogged(){
+    return UserService.loginData!=null;
   }
 
 

@@ -2,10 +2,6 @@
   "app": {
     "name": "Civilian Brigadist"
   },
-  "chat": {
-    "title": "Chat",
-    "notfound": "Chat not found for this fire"
-  },
   "brigade": {
     "title": "Brigade",
     "promoteBrigade": {
@@ -42,10 +38,23 @@
     "title": "Brigades",
     "see": "See brigade"
   },
+  "chat": {
+    "deleted": "Chat deleted successfully",
+    "title": "Chat",
+    "notfound": "Chat not found for this fire",
+    "select": "Select a user to chat",
+    "new": {
+      "error": "We could not open this chat, if the error persist please get in touch"
+    }
+  },
+  "error": {
+    "gps": "We could not connect to your GPS",
+    "notavailableweb": "This feature is not available for web version, just mobile"
+  },
   "fire": {
     "title": "View Fire",
     "chooseLocation": "Click on the map to report the location of the fire",
-    "startCombat": "Fire Fighting",
+    "startCombat": "Start Fighting",
     "stopCombat": "Get out of combat",
     "checking": "Check for Fire",
     "confirmed": "Confirm Fire",
@@ -54,7 +63,14 @@
     "endCombat": "Get out of combat",
     "aftermath": "Start Aftermath",
     "closeCombat": "Close Combat",
-    "finished": "Fire Fighting",
+    "finished": "Fire Extinguished",
+    "intensity": {
+      "verystrong": "Muito Forte",
+      "strong": "Forte",
+      "medium": "Médio",
+      "weak": "Fraco",
+      "veryweak": "Muito Fraco"
+    },
     "new": {
       "title": "Report Fire",
       "fieldTitle": "Name (eg Fire in Joaquin Miller Park)",
@@ -67,6 +83,35 @@
   "fires": {
     "title": "Fires",
     "see": "View Fire"
+  },
+  "item": {
+    "status": {
+      "updated": "Status do ítem do mapa atualizado!",
+      "new": "Ítem críado com sucesso",
+      "updated": "Ítem atualizado com sucesso"
+    },
+    "types": {
+      "plant": "Plant",
+      "rock":  "Rock",
+      "water": "Water",
+      "hole": "Hole",
+      "danger": "Dander",
+      "trail": "Trail",
+      "conservation": "Conservation Area",
+      "city": "City"
+    },
+    "category": "Item category",
+    "chooseLocation": "Click on the map to report the location of the item",
+    "description": "Describe about this item, for example: type of the plant found or about the danger found"
+  },
+  "map": {
+    "additem": "Add Item",
+    "addarea": "Add Area",
+    "title": "Map"
+  },
+  "picture": {
+    "take": "Take picture",
+    "get": "Picture from Gallery"
   },
   "require": {
     "minString": "Is required (minimum 5 characters)."
@@ -95,19 +140,22 @@
     "recover": {
       "title": "Recover Password",
       "enter": "Change Password",
-      "confirm": "Are you sure you want to receive a password recovery email in the email",
+      "confirm": "Are you sure you want to receive a password recovery email in the email {email}?",
       "response": "We've sent you an email with the steps to change your password.",
       "changed": "Your password has been successfully changed, you can use it to sign in."
     },
     "update": {
       "title": "Profile",
-      "error": "We were unable to change your profile because your email already exists in our database or there was an error, please contact us."
+      "error": "We were unable to change your profile because your email already exists in our database or there was an error, please contact us.",
+      "ok": "Your profile was updated successfully"
     },
     "profile": {
-      "title": "User Profile"
+      "title": "User Profile",
+      "my": "My Profile"
     }
   },
   "bio": "How I can help",
+  "blog": "Blog",
   "cancel": "Cancel",
   "chooseOption": "Choose an Option",
   "chooseOptionFail": "Please select an option to continue.",
@@ -118,12 +166,16 @@
   "description": "Description",
   "done": "OK",
   "email": "Email",
+  "enter": "Enter",
   "generalError": "We had an error during your request",
   "intensity": "Intensity",
   "location": "Location",
+  "options": "Options",
   "name": "Name",
   "notfounditems": "No information found.",
   "password": "password",
+  "remove": "Remove",
+  "save": "Save",
   "title": "Title",
   "yesContinue": "Yes, I want to continue"
 }

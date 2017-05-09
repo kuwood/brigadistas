@@ -7,13 +7,18 @@ const { Fire } = require('../fire/models');
 const passport = require('passport');
 const bcrypt = require('bcryptjs');
 const { sendMail,sendEmailAdmins,sendEmailTemplate } = require('../config/emailer');
+const { storageAdd } = require('../config/storage');
 
 router.get('/', function (req, res, next) {
-  User.find({deletedAt: null},'name avatar location createdAt').then(d => { res.json(d);});
+  let find = {deletedAt: null};
+  if(req.query.name){
+    find.name =  { "$regex": req.query.name, "$options": "i" };
+  }
+  User.find(find,'_id name image location createdAt').limit(10).then(d => { res.json(d);});
 });
 
 router.get('/profile/:id/', function (req, res, next) {
-  User.findOne({_id: req.params.id, deletedAt: null},'name avatar bio url updatedAt location createdAt')
+  User.findOne({_id: req.params.id, deletedAt: null},'name image bio url updatedAt location createdAt')
   .then(d => {
     Brigade.find({
         members: {$in: [d._id]}
@@ -112,6 +117,21 @@ router.post('/register', (req, res) => {
 });
 
 
+router.post('/update', passport.authenticate('basic', { session: false }), function (req, res, next) {
+  User.update({_id: req.user._id},req.body.user)
+  .then(d => {  if(d.ok) res.json(req.body.user); else res.sendStatus(500); })
+  .catch(e=>{ res.status(500).json(e); });
+});
+
+router.post('/image/:id', passport.authenticate('basic', { session: false }),function (req, res, next) {
+  var query={_id: req.user._id};
+  User.findOne(query).then(r=>{
+    req.params.datafolder="user";
+    req.params.datafield="image";
+    storageAdd(req,res,r,User);
+  });
+});
+
 router.get('/logout', (req,res)=>{
   req.logout();
   res.json({'success':'ok'});
@@ -141,6 +161,7 @@ router.post('/pushunregister/:type/',passport.authenticate('basic', { session: f
 
 
 router.get('/recover/:username/', (req, res) => {
+  console.log("recover password" + req.params.username);
   User.findOne({username: req.params.username}).then(u=>{
     if(!u) res.sendStatus(404);
 

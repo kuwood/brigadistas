@@ -1,34 +1,52 @@
 'use strict';
 const express = require('express');
 const router = express.Router();
-const { Fire } = require('./models');
+const { Fire, FireTrack } = require('./models');
 const { Brigade } = require('../brigade/models');
 const { Chat } = require('../chat/models');
 const passport = require('passport');
 const mongoose = require('mongoose');
 const {sendAndroid,sendiOS} = require('../config/push');
 const { sendEmailAdmins,sendEmail } = require('../config/emailer');
+const { storageAdd } = require('../config/storage');
 const {logger} = require('../config/logger');
 const {URL} = require('../config/config');
 
 router.get('/', function (req, res, next) {
-  Fire.find({},'_id title description intensity users createdAt coordinates').sort({createdAt: -1}).populate('users').then(d => { res.json(d);});
+  let find={};
+  if(req.query.brigade){
+    find.brigades={$in: [req.query.brigade]};
+  }
+  Fire.find(find,'_id title description intensity users createdAt coordinates image')
+  .sort({createdAt: -1}).populate('users',"_id name image").then(d => { res.json(d);});
 });
 
 router.get('/:id', function (req, res, next) {
-  Fire.findOne({_id: req.params.id}).populate("users").populate("brigades").then(d => { res.json(d);});
+  Fire.findOne({_id: req.params.id}).populate("users","_id name image").populate("brigades","_id name brigades leaders image").then(d => { res.json(d);});
 });
 
 router.put('/:id', passport.authenticate('basic', { session: false }), function (req, res, next) {
   let data=Object.assign(req.body, { users:  [req.user._id], updateAt: new Date() } );
-  Fire.findOneAndUpdate(req.params.id,data,{new:true,$new: true, upsert: true}).then(d => { res.json(d);});
+  let find={_id: req.params.id, users: {$in: [req.user._id]}};
+  Fire.findOneAndUpdate(find,data,{new:true,$new: true, upsert: true}).then(d => { res.json(d);});
 });
 
 router.post('/', passport.authenticate('basic', { session: false }), function (req, res, next) {
   let data=Object.assign(req.body, { users:  [req.user._id], createdAt: new Date(), status: 'open' } );
-  Brigade.find({status: 'active'},'_id brigades').populate("brigades").then(b=>{
+  let find={status: 'active'};
+  //$geoIntersects, $geoWithin or $near
+  find.area={
+    $near: {
+       $geometry: {
+         type: 'Point', coordinates: data.coordinates,
+
+       },
+       $maxDistance: 100
+     }
+   };
+
+  Brigade.find(find,'_id brigades').populate("brigades","_id name image").then(b=>{
     if(b){
-      //TODO: Make brigades getting from polygon are
       data.brigades = b.map(bi=>{return bi._id;});
     }
     newFire(res,data,b);
@@ -36,6 +54,21 @@ router.post('/', passport.authenticate('basic', { session: false }), function (r
     logger.error(`ERROR Gettin Brigades for Create a new fire`,e);
     newFire(res,data);
   });
+});
+
+router.get('/testgeonear', passport.authenticate('basic', { session: false }), function (req, res, next) {
+  let find={status: 'active'};
+  //$geoIntersects, $geoWithin or $near
+  find.area={
+       $near: {
+        $geometry: {
+          type: 'Point', coordinates: [-44.213844537734985,-20.180690243594572],
+
+        },
+        $maxDistance: 100
+      }
+  };
+  Brigade.find(find,'_id brigades').then(b=>{ console.log(b); res.json(b); });
 });
 
 //Create the fire
@@ -99,32 +132,53 @@ router.put('/status/:id/:status', passport.authenticate('basic', { session: fals
   });
 });
 
+router.post('/image/:id', passport.authenticate('basic', { session: false }),function (req, res, next) {
+  var query={_id: req.params.id, users: { $in: [req.user._id] }};
+  Fire.findOne(query).then(r=>{
+    req.params.datafolder="fire";
+    req.params.datafield="image";
+    storageAdd(req,res,r,Fire);
+  });
+});
+
 router.delete('/:id', passport.authenticate('basic', { session: false }), function (req, res, next) {
   Fire.findOneAndDelete(req.params.id,{},{}).then(d => { res.json(d);});
 });
 
-
+let ObjectId = mongoose.Types.ObjectId;
 router.post('/position/:id', passport.authenticate('basic', { session: false }), function (req, res, next) {
-  let dados = {
-    $push: {
-      positions: {
-        user: req.user._id,
-        activityType: req.body.activityType,
-        coordinates: [req.body.lat,req.body.lng]
+ 
+  let find = {user: req.user._id, fire: req.params.id};
+  let update = Object.assign({},find);
+  FireTrack.findOneAndUpdate(find,{$set: update},{new:true,$new: true, upsert: true}).then(d => { 
+    //Check if have coordinates
+    if(!d.coordinates) d.coordinates=[req.body.lng, req.body.lat];
+    else if(d.coordinates[0]!==req.body.lng || d.coordinates[1]!==req.body.lat){
+      if(!d.line.coordinates)  d.line.coordinates=[];
+      if(d.line.coordinates.length==0){
+        d.line.coordinates.push(d.coordinates);
+        d.line.coordinates.push([req.body.lng, req.body.lat]);   
+      }else if(d.line.coordinates.length>0){
+        d.line.coordinates.push([req.body.lng, req.body.lat]);   
       }
-    }
-  };
-  Fire.findOneAndUpdate(req.params.id,dados).then(function(d) {
-    res.json(d);
-  }).catch(d=>{
-    res.json(d);
+      d.line.type="LineString";
+    }    
+    if(d.line.coordinates && d.line.coordinates.length==0) d.line=null;
+
+    FireTrack.update(find,d).then((e)=>{  res.json({d,e});}).catch(e=>res.json(e));
+   
+  }).catch(e=>{
+    console.log(e);
+    res.status(500).json(e);
   });
 });
 
-
+router.get('/tracks/:id', function (req, res, next) {
+  FireTrack.find({fire: req.params.id}).populate("user","_id name image").then(d=> res.json(d)).catch(e=>{res.status(500).json(e)});
+});
 
 //users , watching , checking , fighting , fighters
-router.get('/relation/:fireId/:type', 
+router.get('/relation/:fireId/:type',
 function (req, res, next) {
   Fire.find(req.params.fireId).then(d => {
     res.json(d);
