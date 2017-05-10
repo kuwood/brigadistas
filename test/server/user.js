@@ -54,6 +54,25 @@ describe('Authentication', () => {
             });
     });
 
+    it('should get the user profile', done => {
+         chai.request(app)
+            .post('/api/user/login')
+            .auth(newUser.username, newUser.password)
+            .end((err, res) => {
+                const userId = res.body._id
+                chai.request(app)
+                    .get('/api/user/profile/' + userId)
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        res.should.be.an('object');
+                        res.body.user._id.should.equal(userId);
+                        res.body.user.name.should.equal(newUser.name);
+                        res.body.user.bio.should.equal(newUser.bio);
+                        done();
+                    });
+            });
+    });
+
     it('should logout the user', done => {
         chai.request(app)
             .get('/api/user/logout')
@@ -62,4 +81,6 @@ describe('Authentication', () => {
                 done();
             });
     });
+
+    
 });
